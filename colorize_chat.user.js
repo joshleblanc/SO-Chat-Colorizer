@@ -20,7 +20,7 @@ exec(function() {
 				var user = node.classList[1];
 				var id = user.split("user-")[1];
 				var messages = node.querySelector(".messages");
-				messages.style["background-color"] = "#" + +id.substring(0,6)/100;
+				messages.style["background-color"] = "#" + parseInt(+id.substring(0,6)/500);
 			}
 		}));
 	}
