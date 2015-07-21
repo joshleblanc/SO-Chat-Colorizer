@@ -15,7 +15,24 @@ function exec(fn) {
 
 
 
-exec(function() {		
+exec(function() {	
+	
+	class User {
+		constructor(str) {
+			this.id = str.split("user-")[1];
+			this.full = str;
+			this.color = this.toColor(this.id);
+		}
+		
+		toColor(num) {
+			num >>>= 0;
+			var b = num & 0xFF,
+				g = (num & 0xFF00) >>> 8,
+				r = (num & 0xFF0000) >>> 16;
+			return "rgb(" + [r, g, b].join(",") + ")";
+		}
+	}
+	 
 	class Storage {
 		constructor() {
 			this.length = 0;
@@ -29,7 +46,7 @@ exec(function() {
 		}
 	
 		push(s) {
-			var arr = this.get();
+			const arr = this.get();
 			arr.push(s);
 			this.set(arr);
 		}
@@ -45,53 +62,60 @@ exec(function() {
 		
 	}
 	 
-	function toColor(num) {
-		num >>>= 0;
-		var b = num & 0xFF,
-			g = (num & 0xFF00) >>> 8,
-			r = (num & 0xFF0000) >>> 16;
-		return "rgb(" + [r, g, b].join(",") + ")";
-	}
+	class Watcher {
+		constructor(el) {
+			new MutationObserver(this.onMutation.bind(this)).observe(el, {
+				childList: true,
+				subtree: true
+			});
+		}
 
-	function ruleMaker(s, color) {
-		return "." + s + " .messages " + " { box-shadow: 0px -4px " + color + " }";
-	}	
-	
-	function createStyleSheet() {
-		var style = document.createElement("style");
-		document.head.appendChild(style);
-		sheet = style.sheet;
-	
-		storage.get().forEach(s => {
-			const color = toColor(s.split("user-")[1]);
-			sheet.insertRule(ruleMaker(s, color), sheet.cssRules.length);
-		});
-	}
-	function mapcat(a, fn) {
-		return [...a].reduce((p, c) => [...p].concat(...fn(c)), fn(a[0]), 0);
-	}
-	
-	function isUserContainer(node) {
-		return [...node.classList].includes("user-container");
-	}
+		isUserContainer(node) {
+			return [...node.classList].includes("user-container");
+		}
 
-	function onMutation(mutations) {
-		const addedNodes = mapcat(mutations, m => [...m.addedNodes].filter(isUserContainer));
-		addedNodes.forEach(n => {
-			var user = n.classList[1];
-			if(!storage.has(user)) {
-				const color = toColor(user.split("user-")[1]);
-				storage.push(user);
-				sheet.insertRule(ruleMaker(user, color), sheet.cssRules.length);
-			}
-		});
+		mapcat(a, fn) {
+			return [...a].reduce((p, c) => [...p].concat(...fn(c)), fn(a[0]), 0);
+		}
+
+		onMutation(mutations) {
+			const addedNodes = this.mapcat(mutations, m => [...m.addedNodes].filter(this.isUserContainer));
+			addedNodes.forEach(n => {
+				var user = new User(n.classList[1]);
+				if(!storage.has(user)) {
+					storage.push(user);
+					sheet.insertRule(user);
+				}
+			});
+		}
+	}
+	 
+	class HighlightSheet {
+		constructor() {
+			const style = document.createElement("style");
+			document.head.appendChild(style);
+			this.sheet = style.sheet;
+		}
+		
+		insertRule(user) {
+			this.sheet.insertRule(this.makeRule(user), this.length());
+		}
+
+		length() {
+			return this.sheet.cssRules.length;
+		}
+		
+		makeRule(user) {
+			return "." + user.full + " .messages " + " { box-shadow: 0px -4px " + user.color + " }";
+		}	
+		massInsert(arr) {
+			arr.forEach(s => this.insertRule(s));
+		}
 	}
 	
-	var sheet;
-	var storage = new Storage();
-	createStyleSheet();
-	new MutationObserver(onMutation).observe(chat, {
-		childList: true,
-		subtree: true
-	});
+	const sheet = new HighlightSheet();
+	const storage = new Storage();
+	const watcher = new Watcher(chat);
+	sheet.massInsert(storage.get());
+
 });
