@@ -32,11 +32,7 @@ exec(function() {
 			var arr = this.get();
 			arr.push(s);
 			this.set(arr);
-		}
-	
-		set(s) {
 			this.length++;
-			localStorage.setItem("user-styles", JSON.stringify(s));
 		}
 		
 		has(s) {
