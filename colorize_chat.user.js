@@ -15,7 +15,7 @@ function exec(fn) {
 
 
 
-exec(function() {	
+exec(() => {	
 	
 	class User {
 		constructor(str) {
