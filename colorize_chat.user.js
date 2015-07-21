@@ -106,7 +106,7 @@ exec(() => {
 		}
 		
 		makeRule(user) {
-			return `.${user.full} .messages { box-shadow: 0px -4px ${user.color} }`
+			return `.${user.full} .messages { box-shadow: 0px -2px ${user.color} }`
 		}	
 		massInsert(arr) {
 			arr.forEach(s => this.insertRule(s));
