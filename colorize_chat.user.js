@@ -115,7 +115,9 @@ exec(() => {
 	
 	const sheet = new HighlightSheet();
 	const storage = new Storage();
-	const watcher = new Watcher(chat);
 	sheet.massInsert(storage.get());
+
+	new Watcher(chat);
+
 
 });
