@@ -57,7 +57,7 @@ exec(() => {
 		}
 		
 		has(s) {
-			return this.get().includes(s);
+			return this.get().some(u => u.id == s.id)
 		}
 		
 	}
@@ -116,7 +116,7 @@ exec(() => {
 	const sheet = new HighlightSheet();
 	const storage = new Storage();
 	sheet.massInsert(storage.get());
-
+	sheet.sheet.insertRule(".messages { border-radius: 0 !important }", sheet.length());
 	new Watcher(chat);
 
 
