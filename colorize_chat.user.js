@@ -71,15 +71,15 @@ exec(() => {
 		}
 
 		isUserContainer(node) {
-			return [...node.classList].includes("user-container");
+			return Array.from(node.classList).includes("user-container");
 		}
 
 		mapcat(a, fn) {
-			return [...a].reduce((p, c) => [...p].concat(...fn(c)), fn(a[0]), 0);
+			return Array.from(a).reduce((p, c) => Array.from(p).concat(...fn(c)), fn(a[0]), 0);
 		}
 
 		onMutation(mutations) {
-			const addedNodes = this.mapcat(mutations, m => [...m.addedNodes].filter(this.isUserContainer));
+			const addedNodes = this.mapcat(mutations, m => Array.from(m.addedNodes).filter(this.isUserContainer));
 			addedNodes.forEach(n => {
 				var user = new User(n.classList[1]);
 				if(!storage.has(user)) {
